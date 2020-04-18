@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.shop.dao.TokenDAO"> 
+ 	
+ 	<resultMap type="CustomToken" id="CustomToken">
+		<result property="series" column="series" />
+		<result property="username" column="username" />
+		<result property="tokenValue" column="token" />
+		<result property="date" column="last_used" />
+	</resultMap>
+	
+ 	<!-- 	public void createNewToken(CustomRememberMeToken token); -->
+	<insert id="createNewToken" parameterType="CustomToken">
+		INSERT INTO persistent_logins(series, username, token, last_used) VALUES(#{series}, #{username}, #{tokenValue}, NOW());
+	</insert>
+	
+<!-- 	public void updateNewToken(CustomRememberMeToken token); -->
+	<update id="updateNewToken" parameterType="CustomToken">
+		UPDATE persistent_logins SET token=#{tokenValue}, last_used=NOW() WHERE series = #{series};
+	</update>
+	
+<!-- 	public CustomRememberMeToken getTokenForSeries(String seriesId); -->
+	<select id="getTokenForSeries" parameterType="String" resultMap="CustomToken">
+		SELECT * FROM persistent_logins WHERE series = #{seriesId};
+	</select>
+	
+<!-- 	public void removeUserToken(final String username);	 -->
+	<delete id="removeUserToken" parameterType="String">
+		DELETE FROM persistent_logins WHERE username = #{username};
+	</delete> 	
+
+</mapper>

@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.shop.dao.MemberDAO"> 
+
+	<resultMap type="UserData" id="UserData">
+ 		<result property="u_id" column="u_id"/>
+ 		<result property="u_mail" column="u_mail"/>
+ 		<result property="u_zipcode" column="u_zipcode"/>
+ 		<result property="u_phone" column="u_phone"/>
+ 		<result property="u_name" column="u_name"/>
+ 		<result property="u_addr" column="u_addr"/>
+ 		<result property="u_addr_detail" column="u_addr_detail"/>
+	</resultMap>
+ 	
+ 	 <resultMap type="CustomUser" id="CustomUser">
+ 		<result property="u_account" column="u_account"/>
+ 		<result property="u_password" column="u_pw"/>
+ 		<result property="authorities" column="u_role"/>
+ 		<result property="enabled" column="u_enable"/>
+ 		<result property="u_id" column="u_id"/>
+ 		<result property="u_mail" column="u_mail"/>
+ 		<result property="u_zipcode" column="u_zipcode"/>
+ 		<result property="u_phone" column="u_phone"/>
+ 		<result property="u_name" column="u_name"/>
+ 		<result property="u_addr" column="u_addr"/>
+ 		<result property="u_addr_detail" column="u_addr_detail"/>
+ 	</resultMap>
+
+<!-- 	public CustomUser getUserSimpleByAccount(String account); -->
+ 	 <select id="getUserSimpleByAccount" parameterType="String" resultMap="CustomUser">
+ 		SELECT
+ 		  ut.u_account, ut.u_pw, urt.u_role, urt.u_enable
+ 		FROM user_table as ut INNER JOIN user_role_table as urt
+ 		ON ut.u_id = urt.u_id
+ 		WHERE u_account = #{u_account};
+ 	</select>
+ 	
+<!--  		public UserData getUserDetailByAccount(String account); -->
+ 	 <select id="getUserDetailByAccount" parameterType="String" resultMap="CustomUser">
+ 		SELECT
+ 		  ut.u_account, ut.u_pw, urt.u_role, urt.u_enable, ut.u_id, ut.u_nick, ut.u_mail, ut.u_phone, ut.u_zipcode, ut.u_addr, ut.u_addr_detail, ut.u_name
+ 		FROM user_table as ut INNER JOIN user_role_table as urt
+ 		ON ut.u_id = urt.u_id
+ 		WHERE u_account = #{u_account};
+ 	</select>
+<!--  	 <select id="getUserDetailByAccount" parameterType="String" resultMap="UserData"> -->
+<!--  		SELECT -->
+<!--  		  u_id, u_nick, u_mail, u_phone, u_zipcode, u_addr, u_addr_detail, u_name -->
+<!--  		FROM user_table -->
+<!--  		WHERE u_account = #{u_account}; -->
+<!--  	</select> -->
+
+<!--  	public List<SignUp_Data> loadUserSimpleData(); -->
+ 	<select id="loadUserSimpleDataAll" resultType="SignUp_Data">
+ 		SELECT u_id, u_account, u_nick, u_name, u_phone, u_mail	FROM user_table;
+ 	</select>
+ 	
+ 	<select id="countTargetUser" resultType="int">
+ 		SELECT COUNT(*) as count FROM user_table
+ 		WHERE u_id != #{u_id}
+ 		<if test='u_account != null and !u_account.equals("")'>
+ 			AND u_account like concat('%',#{u_account},'%')
+ 		</if>
+ 		<if test='u_nick != null and !u_nick.equals("")'>
+ 			AND u_nick like concat('%',#{u_nick},'%')
+ 		</if>
+ 		<if test='u_name != null and !u_name.equals("")'>
+ 			AND u_name like concat('%',#{u_name},'%')
+ 		</if>
+ 		<if test='u_phone != null and !u_phone.equals("")'>
+ 			AND u_phone like concat('%',#{u_phone},'%')
+ 		</if>
+ 		<if test='u_date_start != null and !u_date_start.equals("")'>
+ 			AND u_date BETWEEN #{u_date_start} AND #{u_date_end};
+ 		</if>
+ 	</select>
+ 	
+<!-- 	public List<SignUp_Data> loadUserSimpleDataSel(SignUp_Data searchData); --> 	
+ 	<select id="loadUserSimpleDataSel" parameterType="SignUp_Data" resultType="SignUp_Data">
+ 		SELECT u_id, u_account, u_nick, u_name, u_phone, u_mail	FROM user_table
+ 		WHERE u_id != #{u_id}
+ 		<if test='u_account != null and !u_account.equals("")'>
+ 			AND u_account like concat('%',#{u_account},'%')
+ 		</if>
+ 		<if test='u_nick != null and !u_nick.equals("")'>
+ 			AND u_nick like concat('%',#{u_nick},'%')
+ 		</if>
+ 		<if test='u_name != null and !u_name.equals("")'>
+ 			AND u_name like concat('%',#{u_name},'%')
+ 		</if>
+ 		<if test='u_phone != null and !u_phone.equals("")'>
+ 			AND u_phone like concat('%',#{u_phone},'%')
+ 		</if>
+ 		<if test='u_date_start != null and !u_date_start.equals("")'>
+ 			AND u_date BETWEEN #{u_date_start} AND #{u_date_end}
+ 		</if>
+ 		ORDER BY u_id DESC limit #{page}, 10;
+ 	</select>
+ 	
+<!--  		public int updateUserDetails(UserData resData); -->
+ 	<update id="updateUserDetails" parameterType="UserData">
+ 		UPDATE user_table SET
+ 		<if test='u_name != null and !u_name.equals("")'>
+ 			u_name = #{u_name},
+ 		</if>
+ 		<if test='u_phone != null and !u_phone.equals("")'>
+ 			u_phone = #{u_phone},
+ 		</if>
+ 		<if test='u_addr != null and !u_addr.equals("")'>
+ 			u_addr = #{u_addr},
+ 		</if>
+ 		<if test='u_addr_detail != null and !u_addr_detail.equals("")'>
+ 			u_addr_detail = #{u_addr_detail},
+ 		</if>
+ 		<if test='u_zipcode != null and !u_zipcode.equals("")'>
+ 			u_zipcode = #{u_zipcode},
+ 		</if>
+ 			u_nick = #{u_nick}
+ 		WHERE u_id = #{u_id};
+ 	</update>
+ 	
+ 	 <insert id="setUserRole" parameterType="map">
+ 		INSERT INTO
+  		 user_role_table(u_id, u_role) 
+  		VALUES(#{u_id}, #{uuid});
+ 	</insert> 	
+ 	
+ 	<update id="modifyNewUserRole" parameterType="map">
+ 		UPDATE user_role_table
+ 		  SET u_enable = 'Y'
+ 		  WHERE u_id = ${u_id} AND u_enable = ${uuid}; 	
+ 	</update>
+ 	
+ 	<insert id="setUserData" parameterType="SignUp_Data" useGeneratedKeys="true" keyProperty="u_id">
+ 		INSERT INTO
+  		  user_table(u_account, u_nick, u_pw, u_zipcode, u_addr, u_addr_detail, u_mail, u_phone, u_name, u_date) 
+  		  VALUES(#{u_account}, #{u_nick}, #{u_pw}, #{u_zipcode}, #{u_addr}, #{u_addr_detail}, #{u_mail}, #{u_phone}, #{u_name}, NOW());
+ 	</insert> 	
+ 	
+ 	<insert id="setUserRoleData" parameterType="map">
+ 		INSERT INTO
+ 		  user_role_table(u_id, u_role, u_enable)
+ 		  VALUES(#{u_id}, #{u_role}, #{u_enable});
+ 	</insert>
+
+ 	<select id="countRowById" parameterType="String" resultType="int">
+ 		SELECT
+ 		  COUNT(*) as count
+ 		FROM user_table
+ 		WHERE u_account = #{u_account};
+ 	</select> 	
+ 	
+ 	<select id="countRowByNick" parameterType="String" resultType="int">
+ 		SELECT
+ 		  COUNT(*) as count
+ 		FROM user_table
+ 		WHERE u_nick = #{u_nick};
+ 	</select> 	
+ 	
+ 	 	
+<!--  	public int disableUser(int u_id); -->
+	<update id="disableUser">
+		UPDATE user_role_table
+		SET u_enable = "N"
+		WHERE u_id = #{u_id};
+	</update>
+	
+<!-- 	public int getUserDetailByU_id(int u_id) -->
+	<select id="getUserDetailByU_id" resultType="UserData">
+	 	SELECT
+ 		  ut.u_account, ut.u_pw, urt.u_role, urt.u_enable, ut.u_id, ut.u_nick, ut.u_mail, ut.u_phone, ut.u_zipcode, ut.u_addr, ut.u_addr_detail, ut.u_name
+ 		FROM user_table as ut INNER JOIN user_role_table as urt
+ 		ON ut.u_id = urt.u_id
+ 		WHERE ut.u_id = #{u_id};
+	</select>
+
+ 	
+</mapper>

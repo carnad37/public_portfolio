@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.shop.dao.AdminDAO">  
+ 	<resultMap type="QnA_Post" id="QnA_Post">
+ 		<result property="no" column="no"/>
+ 		<result property="que_id" column="que_id"/>
+ 		<result property="u_id" column="u_id"/>
+ 		<result property="que_secret" column="que_secret"/>
+ 		<result property="que_title" column="que_title"/>
+ 		<result property="que_text" column="que_text"/>
+ 		<result property="que_date" column="que_date"/>
+ 		<result property="que_check" column="que_check"/>
+ 	</resultMap>
+  	
+ 	<select id="getQnA_AllData" parameterType="int" resultMap="QnA_Post">
+		SELECT * FROM qna_qesution_table WHERE que_exist = 1 ORDER BY que_id DESC limit #{nowPage}, 10;
+ 	</select>
+ 	
+	<select id="getQnA_SecretPreData" parameterType="map" resultMap="QnA_Post">
+<!-- 		SELECT -->
+<!-- 		  @rownum:=@rownum+1 as no, target.que_id, target.que_title, target.que_date, target.que_check -->
+<!-- 		FROM (SELECT @rownum := 0) R, -->
+<!-- 		(SELECT target.que_id, target.que_title, target.que_date, target.que_check, -->
+<!-- 		target.que_secret, target.que_exist, ut.u_account FROM qna_question_table as target -->
+<!-- 		INNER JOIN user_table as ut ON target.u_id = ut.u_id) as target -->
+<!-- 		WHERE que_secret = 1 AND que_exist = 1 AND u_account = #{target_id} -->
+<!-- 		ORDER BY no DESC limit #{nowPage}, 10; -->
+<!-- 		SELECT -->
+		SELECT
+		  @rownum:=@rownum+1 as no, target.que_id, target.que_title, target.que_date, target.que_check
+		FROM (SELECT @rownum := 0) R, qna_question_table as target
+		WHERE que_secret = 1 AND que_exist = 1 AND u_id = #{target_id}
+		ORDER BY no DESC limit #{nowPage}, 10;
+ 	</select>
+ 	
+	<select id="getQnA_publicPreData" parameterType="int" resultMap="QnA_Post">
+		SELECT
+		 @rownum:=@rownum+1 as no, target.que_id, target.que_title, target.que_date, target.que_check
+		FROM (SELECT @rownum := 0) R, qna_question_table as target
+		WHERE que_secret = 0 AND que_exist = 1
+		ORDER BY no DESC limit #{nowPage}, 10;
+ 	</select> 
+ 	
+ 	<insert id="setQnA_Post" parameterType="QnA_Post">
+ 		INSERT INTO
+  		 qna_question_table(u_id, que_secret, que_title, que_text, que_date, que_check, que_exist) 
+  		VALUES(#{u_id}, #{que_secret}, #{que_title}, #{que_text}, NOW(), 0, 1);
+ 	</insert> 
+ 	
+<!-- 	public List<QnA_Post> getQnA_SecretSearchData(Map<String, Object> nowData);	 -->
+	
+	
+	
+<!-- 	public List<QnA_Post> getQnA_PublicSearchData(Map<String, Object> nowData);  -->
+	<select id="getQnA_PublicSearchData" parameterType="map" resultMap="QnA_Post">
+		SELECT
+		 @rownum:=@rownum+1 as no, target.que_id, target.que_title, target.que_date, target.que_check
+		FROM (SELECT @rownum := 0) R,
+		  (SELECT * FROM qna_question_table WHERE que_secret = 0 AND que_exist = 1) as target
+		WHERE
+ 		<if test='option != 2'>
+ 			que_title like concat('%',#{que_title},'%')
+ 		</if>
+ 		<if test='option == 0'>
+ 			OR
+ 		</if>
+ 		<if test='option != 1'>
+ 			que_text like concat('%',#{que_text},'%')
+ 		</if>
+		ORDER BY no DESC limit #{nowPage}, 10;
+ 	</select>
+ 	
+<!--  	public QnA_Post getQnA_Post(QnA_Post post); -->
+	<select id="getQnA_Post" parameterType="QnA_Post" resultMap="QnA_Post">
+		SELECT
+			target_table.que_title, target_table.que_text, target_table.que_date, target_table.u_nick, target_table.que_check
+		FROM (SELECT qqt.que_title, qqt.que_text, qqt.que_date, qqt.que_id, user_table.u_nick, qqt.u_id, qqt.que_check
+			  FROM qna_question_table as qqt INNER JOIN user_table ON qqt.u_id = user_table.u_id
+			  WHERE qqt.que_secret = 0 OR qqt.u_id = #{u_id}) as target_table
+		WHERE target_table.que_id = #{que_id};
+	</select>
+	
+<!-- 	public int delQnA_Post(@Param("u_id") int u_id, @Param("que_id") int que_id); -->
+	<update id="delQnA_Post">
+		UPDATE qna_question_table SET que_exist = 0 WHERE que_id = #{que_id} AND u_id = #{u_id};
+	</update>
+ 	
+<!--  	public int addQnAReply(@Param("ans_text") String ans_text, @Param("que_id") int que_id); -->
+ 	<insert id="addQnAReply" parameterType="QnAComment">
+ 		INSERT INTO qna_answer_table(ans_text, que_id, ans_exist, ans_date)
+ 		VALUES(#{ans_text}, #{que_id}, 1, NOW());
+ 	</insert> 	
+ 	
+<!--  	public int getQnAReply(int que_id); -->
+ 	<select id="getQnAReply" resultType="QnAComment">
+ 		SELECT ans_text, ans_date FROM qna_answer_table WHERE que_id = #{que_id} AND ans_exist = 1;
+ 	</select>
+<!--  	public int setQnAReplyCheck(int que_id); -->
+	<update id="setQnAReplyCheck">
+		UPDATE qna_question_table SET que_check = 1 WHERE que_id = #{que_id};
+	</update>
+ 	
+</mapper>

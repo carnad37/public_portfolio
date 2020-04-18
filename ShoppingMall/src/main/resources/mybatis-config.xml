@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd" >
+<configuration>
+	<settings>
+		<setting name="cacheEnabled" value="false"/>
+	</settings>
+
+	<typeAliases>
+		<typeAlias alias="QnA_Post" type="com.shop.admin.dto.QnA_Post"/>
+		<typeAlias alias="CustomUser" type="com.shop.main.security.role.CustomUser"/>
+		<typeAlias alias="SignUp_Data" type="com.shop.admin.dto.SignUp_Data"/>
+		<typeAlias alias="Product" type="com.shop.product.dto.Product"/>
+		<typeAlias alias="Category" type="com.shop.admin.dto.Category"/>
+		<typeAlias alias="Banner" type="com.shop.admin.dto.Banner"/>
+		<typeAlias alias="QnAComment" type="com.shop.admin.dto.Comment"/>
+		<typeAlias alias="Comment" type="com.shop.product.dto.Comment"/>
+		<typeAlias alias="CommentSub" type="com.shop.product.dto.CommentSub"/>
+		<typeAlias alias="UserData" type="com.shop.admin.dto.UserData"/>
+		<typeAlias alias="Ckeditor" type="com.shop.product.dto.Ckeditor"/>
+		<typeAlias alias="CustomToken" type="com.shop.admin.dto.CustomRememberMeToken"/>
+		<typeAlias alias="ProductOrder" type="com.shop.product.dto.ProductOrder"/>
+	</typeAliases>
+	
+	<mappers>		
+    	<mapper resource ="mappers/admin-mapper.xml"/>
+    	<mapper resource ="mappers/product-mapper.xml"/>
+    	<mapper resource ="mappers/category-mapper.xml"/>
+    	<mapper resource ="mappers/config-mapper.xml"/>    	
+    	<mapper resource ="mappers/member-mapper.xml"/>
+    	<mapper resource ="mappers/token-mapper.xml"/>
+    	<mapper resource ="mappers/order-mapper.xml"/>
+	</mappers>		 
+	
+</configuration>

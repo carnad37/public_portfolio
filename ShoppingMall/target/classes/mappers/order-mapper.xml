@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.shop.dao.OrderDAO"> 
+
+<!--  	public int insertNewOrder(ProductOrder order); -->
+	<insert id="insertNewOrder" parameterType="ProductOrder">
+		INSERT INTO order_table(p_id, u_id, o_num, o_state, o_date)
+		VALUES(#{p_id}, #{u_id}, #{o_num}, 1, NOW());
+	</insert>
+	
+<!-- 	public List<ProductOrder> getOrder(int p_id, int u_id); -->
+	<select id="getOrder" resultType="ProductOrder">
+		SELECT * FROM order_table
+		WHERE EXIST(SELECT * FROM product WHERE p_id=#{p_id} AND u_id=#{u_id})
+		AND p_id=#{p_id};
+	</select>
+
+<!-- 	public int updateOrderState(ProductOrder order);	 -->
+
+<!-- 	public int getOrderCount(int p_id) -->
+	<select id="getOrderCount" resultType="int">
+		SELECT COUNT(*) as count FROM order_table WHERE p_id = #{p_id};
+	</select>
+
+</mapper>

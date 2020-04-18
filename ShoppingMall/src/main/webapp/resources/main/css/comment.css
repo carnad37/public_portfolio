@@ -1,0 +1,123 @@
+/*말풍선 감싸는 div*/
+.talk_contatiner {
+    max-width: 600px;
+/*     border: 5px solid #5bc0de; */
+    height: 100%;
+    border-radius: 30px;
+    text-align: center;
+    margin: 0 auto;
+    padding: 0;
+    overflow: auto;
+    /*-ms-overflow-style : none;*/
+}
+
+.custom-kakao-background {
+	background-color: rgb(170, 191, 208);
+}
+
+.custom-secret-button {
+	position: absolute;
+	left: 20px;
+}
+
+.custom-right-radius {
+	border-top-right-radius: 0.25rem !important;
+	border-bottom-right-radius: 0.25rem !important;
+}
+
+.custom-long-view-top {
+	height: 35vh;
+}
+
+.custom-long-view-bottom {
+	height: calc(35vh + 71px);
+}
+
+.custom-long-view-bottom textarea {
+	height: calc(35vh + 31px);
+}
+
+.custom-card-height {
+	height: 70vh;
+}
+/*스크롤바 가리기*/
+/*::-webkit-scrollbar {display:none;}*/
+
+/*말풍선 내부 텍스트파트 설정*/
+.talk_contatiner .talk_texts {
+    width: 336px;
+    height: inherit;
+    margin: 10px;
+    padding: 0;
+    overflow: auto;
+    word-break: break-all;
+    text-align: left;
+    line-height: 1.3em;
+    /*줄간격 지정*/
+}
+
+/*좌측 말풍선*/
+.talk_contatiner .talk_bubble_left {
+    display: inline-block;
+    position: relative;
+    float: left;
+    background: #fff;
+    width: 450px;
+    min-height: 30px;
+    border: 2px solid #0069d9;
+    border-radius: 10px;
+    margin: 20px;
+}
+/*공통부분*/
+.talk_bubble_left:before, .talk_bubble_left:after{
+    content: '';
+    position: absolute;
+    width: 0px;
+    height: 0px;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    bottom: 10px;
+}
+/*좌측 말풍선 삼각형 : 아래 깔리는거*/
+.talk_bubble_left:before { 
+    border-right: 15px solid #0069d9;
+    left: -15px;
+}
+/*좌측 말풍선 삼각형 내부 배경지정 : 위에 덮히는거*/
+.talk_bubble_left:after {
+    border-right: 15px solid #fff;
+    left: -12px;
+}
+
+/*우측 말풍선*/
+.talk_contatiner .talk_bubble_right {
+    display: inline-block;
+    position: relative;
+    float: right;
+    background-color: rgb(253, 231, 0);
+    margin: 0 auto;
+    width: 450px;
+    min-height: 30px;
+    border: 2px solid #5cb85c;
+    border-radius: 10px;
+    margin: 20px;
+}
+
+/*우측 말풍선 삼각형*/
+.talk_bubble_right:before,.talk_bubble_right:after{
+    content: '';
+    position: absolute;
+    width: 0px;
+    height: 0px;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    bottom: 10px;
+}
+.talk_bubble_right:before {       
+    border-left: 15px solid #5cb85c;
+    right: -15px;    
+}
+.talk_bubble_right:after {
+    border-left: 15px solid rgb(253, 231, 0);
+    right: -12px;
+}

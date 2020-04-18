@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.shop.dao.ProductDAO">
+  
+	<resultMap type="Category" id="Category">
+		<result property="c_id" column="c_id" />
+		<result property="c_name" column="c_name" />
+	</resultMap>
+
+	<resultMap type="Ckeditor" id="Ckeditor">
+		<result property="ck_file" column="ck_file" />
+		<result property="ck_state" column="ck_state" />
+		<result property="u_id" column="u_id" />
+	</resultMap>
+	
+	<!-- 상품등록 Add -->
+	<insert id="productAdd" parameterType="Product" useGeneratedKeys="true" keyProperty="p_id">
+		INSERT INTO product
+			(c_id, p_name, p_text, p_title, p_price, p_quantity, u_id, p_date, p_thumbnail) 
+		VALUES (#{c_id},#{p_name},#{p_text},#{p_title},#{p_price},#{p_quantity},#{u_id},NOW(),#{p_thumbnail});
+	</insert>
+	
+ 	<!-- 상품목록페이지 List -->
+<!-- 	<select id="productList" resultType="Product"> -->
+<!-- 		SELECT u_nick, p_date, p_thumbnail, p_title, p_id, p_price FROM product ; -->
+<!-- 	</select> -->
+	
+	<select id="productSearchList" resultType="Product">
+		SELECT target.u_nick, target.p_date, target.p_thumbnail, target.p_title, target.p_id, target.p_price
+		FROM (SELECT product.*, user_table.u_nick FROM product INNER JOIN user_table ON user_table.u_id = product.u_id
+	 	<if test="c_id != 0">
+			WHERE c_id = #{c_id}
+		</if>		
+		) as target
+		WHERE
+ 			target.p_title like concat('%',#{targetWord},'%') OR
+ 			target.p_text like concat('%',#{targetWord},'%')
+		ORDER BY target.p_id DESC LIMIT #{pagenum}, #{contentnum};
+	</select>
+	
+	<select id="productList" resultType="Product">
+		SELECT u_nick, p_date, p_thumbnail, p_title, p_id, p_price
+		FROM (SELECT product.*, user_table.u_nick FROM product INNER JOIN user_table ON user_table.u_id = product.u_id) as target
+		ORDER BY p_id DESC LIMIT #{pagenum}, #{contentnum};
+	</select>
+	
+	<select id="totalCount" resultType="int">
+		SELECT COUNT(*) FROM product ;
+	</select>
+	
+	<!-- 상품페이지 정보 -->
+	<select id="productRead" resultType="Product">
+		SELECT * product;
+	</select>
+	
+	<select id="productP_id" parameterType="Product" resultType="Product">
+		SELECT p_id FROM product WHERE u_id = #{u_id} and p_title = #{p_title} and p_text = #{p_text};
+	</select>
+	
+	<select id="selectProductByU_id" resultType="Product">
+		SELECT product.p_id, p_name, p_title, o_state
+		FROM product LEFT OUTER JOIN order_table
+		ON product.p_id = order_table.p_id
+		WHERE product.u_id = #{u_id}
+		ORDER BY product.p_id DESC limit #{page}, 10;
+	</select>
+	
+	<select id="countOrderByU_id" resultType="int">
+		SELECT COUNT(*) as count
+		FROM order_table WHERE u_id = #{u_id};
+	</select>
+	
+	<select id="selectOrderByU_id" resultType="Product">
+		SELECT product.p_id, p_name, p_title, o_state
+		FROM product INNER JOIN (SELECT * FROM order_table WHERE u_id = #{u_id}) as target
+		ON product.p_id = target.p_id
+		ORDER BY product.p_id DESC limit #{page}, 10;
+	</select>
+	
+	<select id="countProductByU_id" resultType="int">
+		SELECT COUNT(*) as count
+		FROM product WHERE u_id = #{u_id};
+	</select>
+	
+	<select id="productPage" parameterType="int" resultType="Product">
+		SELECT * FROM product WHERE p_id = #{p_id};
+	</select>
+	
+	<insert id="insertQuestion" parameterType="Comment">
+		INSERT INTO product_question_table 
+			(pq_id, u_id, p_id, u_nick, pq_title, pq_text, pq_date, pq_secret, pq_exist)
+		VALUES (#{pq_id}, #{u_id}, #{p_id}, #{u_nick}, #{pq_title}, #{pq_text},  NOW(), #{pq_secret}, #{pq_exist});
+	</insert>
+	
+	<select id="loadQ_list" parameterType="int" resultType="Comment">
+		SELECT * FROM product_question_table WHERE p_id = #{p_id};
+	</select>
+	
+	<select id="get_pq_u_id" parameterType="int" resultType="CommentSub">
+		SELECT pq_id,u_id FROM product_question_table WHERE p_id = #{p_id};
+	</select>
+	
+	<update id="addReply" parameterType="Comment">
+		Update product_question_table SET pq_answer=#{pq_answer}, pq_status=#{pq_status}, pq_answerdate=NOW() WHERE pq_id = #{pq_id};
+	</update>
+	
+	<select id="getCategory" resultMap="Category">
+ 		SELECT * FROM category_table;
+ 	</select>
+ 	
+ 	<insert id="insertCkeditorImage" parameterType="Ckeditor">
+ 		INSERT INTO ckeditor_images_table(ck_file, ck_state, u_id) VALUES(#{ck_file}, 0, #{u_id});
+ 	</insert>
+ 	
+ 	<delete id="deleteCkeditorImageByU_id">
+ 	    DELETE FROM ckeditor_images_table WHERE u_id = #{u_id} AND ck_state = 0;
+ 	</delete>
+ 	
+ 	<delete id="deleteCkeditorImageByP_id">
+ 	    DELETE FROM ckeditor_images_table WHERE p_id = #{p_id};
+ 	</delete>
+ 	
+ 	<select id="selectCkeditorDeleteImage" parameterType="int" resultType="string">
+ 		SELECT ck_file FROM ckeditor_images_table WHERE u_id = #{u_id} AND ck_state = 0;
+ 	</select>
+ 	
+ 	<update id="updateCkeditorState" parameterType="Ckeditor">
+ 		UPDATE ckeditor_images_table SET p_id = #{p_id}, ck_state = 1 WHERE u_id = #{u_id};
+ 	</update>
+ 	
+<!--  	public int insertProductReply(Comment comment); -->
+	<insert id="insertProductReply" parameterType="Comment">
+		INSERT INTO product_question_table(p_id, u_id, pq_text, pq_date, pq_secret, pq_exist)
+		VALUES (#{p_id}, #{u_id}, #{pq_text}, NOW(), 0, 1);
+<!-- 		INSERT INTO product_question_table(p_id, u_id, pq_text, pq_date, pq_secret, pq_exist) -->
+<!-- 		SELECT #{p_id}, #{u_id}, #{pq_text}, NOW(), 0, 1 FROM DUAL -->
+<!-- 		WHERE NOT EXISTS(SELECT * FROM product WHERE p_id = #{p_id} AND u_id = #{u_id}); -->
+	</insert>
+	
+	<select id="getProductReplyList" resultType="Comment">
+		SELECT pq.pq_text, pq.pq_date, pq.pq_id, user_table.u_nick, pq.u_id
+		FROM product_question_table as pq INNER JOIN user_table ON pq.u_id = user_table.u_id
+		WHERE pq.pq_secret = 0 AND pq.pq_exist = 1 AND pq.p_id = #{p_id}
+		ORDER BY pq.pq_id DESC;
+	</select>
+	
+	<select id="getProductByCookie" parameterType="java.util.List" resultType="Product">
+		SELECT * FROM product
+		WHERE p_id IN(
+		<foreach collection="list" item="element" separator=",  " index="index">
+			#{element}
+		</foreach>
+		);
+	</select>
+	
+	<select id="getRecentProduct" resultType="Product">
+		SELECT * FROM (SELECT * FROM product ORDER BY p_id DESC) as target
+		LIMIT 0, 5;
+	</select>
+ 	
+</mapper>
+
+
+<!-- SELECT * FROM product WHERE p_id = #{p_id} and u_id = #{u_id} and c_id = #{c_id} -->
+
+<!-- 상품목록 가져오기 -->
+<!--    <select id="productlist" parameterType="Product"> -->
+<!--    	SELECT * FROM product; -->
+<!--    </select> -->

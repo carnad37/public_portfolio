@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+		
+	<security:http pattern="/**/*.js" security="none"/>
+	<security:http pattern="/**/*.css" security="none"/>
+	<security:http pattern="/ckeditor/**" security="none"/>
+	
+	<security:http auto-config="true" use-expressions="true">
+	<security:headers>
+		<security:frame-options policy="SAMEORIGIN"/>		
+	</security:headers>
+	<security:intercept-url pattern="/admin/**" access="hasAnyRole('ROLE_ADMIN')" /> 
+	<security:intercept-url pattern="/member/**" access="permitAll" />
+	<security:intercept-url pattern="/product/search_list" access="permitAll" /> 	
+	<security:intercept-url pattern="/product/**" access="hasAnyRole('ROLE_USER, ROLE_ADMIN')" /> 
+	<security:intercept-url pattern="/profile/**" access="hasAnyRole('ROLE_USER')" /> 
+	<security:intercept-url pattern="/board/**" access="hasAnyRole('ROLE_USER, ROLE_ADMIN')" /> 
+	
+	<security:form-login login-page="/error/anonymous"
+						 always-use-default-target="false"
+						 login-processing-url="/sign_in"
+						 username-parameter="login_id"
+						 password-parameter="login_pw"	
+						 authentication-success-handler-ref="customSucessHandler"
+						 />					 		
+<!-- 		authentication-success-handler-ref="loginSuccessHandler" -->
+<!-- 		authentication-failure-handler-ref="loginFailureHandler" -->		
+	<security:logout logout-url="/profile/sign_out"
+			invalidate-session="true"
+			delete-cookies="JSESSIONID, REMEMBER-ME"
+			logout-success-url="/"/>
+
+	<security:remember-me token-repository-ref="customTokenRepository"
+						  user-service-ref="userService"
+						  token-validity-seconds="604800"
+						  remember-me-cookie="*********"/>
+<!-- 	<security:remember-me key="ShoppingMall" -->
+<!-- 						  token-validity-seconds="604800" -->
+<!-- 						  remember-me-cookie="REMEMBER-ME"/> -->
+
+	<security:session-management>
+		<security:concurrency-control max-sessions="1" error-if-maximum-exceeded="true"/>
+	</security:session-management>
+	
+	<security:access-denied-handler ref="accessDeniedHandler"/>
+	<security:csrf/>
+	</security:http>
+	
+	<!-- secured method -->
+	
+	<security:global-method-security secured-annotations="enabled" />
+	
+	<!-- provider -->
+	
+	<security:authentication-manager  alias="authenticationManager">
+		<security:authentication-provider ref="customProvider"/>
+	    <security:authentication-provider user-service-ref="userService"/>
+	</security:authentication-manager>
+
+</beans>

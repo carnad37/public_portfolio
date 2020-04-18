@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	<context:component-scan base-package="com.shop.main.security.core, com.shop.main.service" />
+
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+		<property name="url" value="jdbc:mysql://localhost:3306/shopping_mall?serverTimezone=UTC"></property>
+		<property name="username" value="*********"></property>
+		<property name="password" value="*********"></property>
+	</bean>	
+		
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="configLocation" value="classpath:/mybatis-config.xml"></property>
+	</bean>
+	
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactory"/>
+	</bean>
+	
+	<!-- DAO and Services -->
+
+	<bean id="adminDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.shop.dao.AdminDAO"/>
+		<property name="sqlSessionTemplate" ref="sqlSession"></property>
+	</bean>
+	
+	<bean id="categoryDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.shop.dao.CategoryDAO"/>
+		<property name="sqlSessionTemplate" ref="sqlSession"></property>
+	</bean>
+	
+	<bean id="productDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.shop.dao.ProductDAO"/>
+		<property name="sqlSessionTemplate" ref="sqlSession"></property>
+	</bean>
+	
+	<bean id="configurationDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.shop.dao.ConfigurationDAO"/>
+		<property name="sqlSessionTemplate" ref="sqlSession"></property>
+	</bean>
+	
+	<bean id="memberDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.shop.dao.MemberDAO"/>
+		<property name="sqlSessionTemplate" ref="sqlSession"></property>
+	</bean>
+		
+	<bean id="tokenDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.shop.dao.TokenDAO"/>
+		<property name="sqlSessionTemplate" ref="sqlSession"></property>
+	</bean>
+	
+	<bean id="orderDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.shop.dao.OrderDAO"/>
+		<property name="sqlSessionTemplate" ref="sqlSession"></property>
+	</bean>
+	
+	<bean id="adminServices" class="com.shop.admin.service.AdminServices">
+		<constructor-arg ref="adminDAO"/>
+	</bean>
+	
+	<bean id="categoryServices" class="com.shop.admin.service.CategoryServices">
+		<constructor-arg ref="categoryDAO"/>
+	</bean>
+	
+	<bean id="productServices" class="com.shop.product.service.ProductService">
+		<constructor-arg ref="productDAO"/>
+	</bean>
+	
+	<bean id="memberServies" class="com.shop.admin.service.MemberServices">
+		<constructor-arg ref="memberDAO"/>
+	</bean>
+	
+	<bean id="orderServies" class="com.shop.product.service.OrderServices">
+		<constructor-arg ref="orderDAO"/>
+	</bean>
+		
+	<!-- Security -->
+	
+	<bean id="customProvider" class="com.shop.main.security.core.CustomAuthenticationProvider"/>
+	<bean id="userService" class="com.shop.main.security.core.CustomUserService"/>	
+	
+	<!-- UploadControl -->
+
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="5000000" />
+<!-- 		<property name="maxInMemorySize" value="5000000" /> -->
+	</bean>
+				
+	<bean id="mailSender" class = "org.springframework.mail.javamail.JavaMailSenderImpl">
+      <property name="host" value="smtp.gmail.com" />
+      <property name="port" value="587" />
+      <property name="username" value="*********" />
+      <property name="password" value="*********" />
+      <property name="javaMailProperties">
+         <props>
+               <prop key="mail.transport.protocol">smtp</prop>
+               <prop key="mail.smtp.auth">true</prop>
+               <prop key="mail.smtp.starttls.enable">true</prop>
+               <prop key="mail.debug">true</prop>
+         </props>
+      </property>
+   </bean>	
+   
+   <!-- Site Config -->
+		
+	<bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+	
+</beans>
