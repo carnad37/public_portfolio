@@ -15,7 +15,7 @@
 		<mysql.version>5.1.10</mysql.version>		
 <!-- 		<mysql.version>8.0.16</mysql.version> -->
 		<org.apache.tiles-version>3.0.5</org.apache.tiles-version>
-		<org.springsecuriy-version>4.0.3.RELEASE</org.springsecuriy-version>
+		<org.springsecuriy-version>5.2.10.RELEASE</org.springsecuriy-version>
 	</properties>
 	<dependencies>
 		<!-- Spring -->
